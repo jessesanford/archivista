@@ -44,15 +44,22 @@ func (store *Store) PutBlob(idx string, obj []byte) error {
 }
 
 // New returns a reader/writer for storing/retrieving attestations
-func New(ctx context.Context, endpoint, accessKeyId, secretAccessKeyId, bucketName string, useTLS bool) (*Store, <-chan error, error) {
+func New(ctx context.Context, endpoint, accessKeyId, secretAccessKeyId, bucketName string, useTLS bool, useIRSA bool) (*Store, <-chan error, error) {
 	errCh := make(chan error)
 	go func() {
 		<-ctx.Done()
 		close(errCh)
 	}()
 
+  var creds *credentials.Credentials
+  if useIRSA {
+    creds = credentials.NewIAM("https://sts.amazonaws.com")
+  } else {
+    creds = credentials.NewStaticV4(accessKeyId, secretAccessKeyId, "")
+  }
+
 	c, err := minio.NewWithOptions(endpoint, &minio.Options{
-		Creds:  credentials.NewStaticV4(accessKeyId, secretAccessKeyId, ""),
+		Creds:  creds,
 		Secure: useTLS,
 	})
 	if err != nil {

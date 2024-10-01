@@ -169,6 +169,7 @@ func initObjectStore(ctx context.Context, cfg *config.Config) (server.StorerGett
 			cfg.BlobStoreSecretAccessKeyId,
 			cfg.BlobStoreBucketName,
 			cfg.BlobStoreUseTLS,
+			cfg.BlobStoreUseIRSA,
 		)
 
 	case "":
